@@ -1,0 +1,62 @@
+Herzeln (Spiel)
+
+* **Multiplayer-Fähigkeit** (Echtzeit-Interaktion für mehrere menschliche Spieler statt nur gegen Bots).
+* **Rundenende bei Erreichen der 8 €** (bzw. ein dynamisches Kassa-Limit / Rundenende, sobald die 8 € Strafsumme in einer Runde voll sind) inklusive transparenter Anzeige, wer wie viel pro Runde und insgesamt im gesamten Spiel bezahlt hat.
+
+---
+
+```markdown
+# Role & Goal
+Du bist ein hervorragender Full-Stack-Entwickler und UI/UX-Designer. Erstelle eine moderne, elegante und voll funktionsfähige **Multiplayer-WebApp** für das traditionelle Kartenspiel "Herzeln" (Runder Tisch / Stiche-Raten bzw. Strafkarten-Vermeidung).
+
+## Tech-Stack & Architektur
+- **Frontend:** HTML5, CSS3 (mit modernem Tailwind CSS über CDN für ein responsives, sauberes Design).
+- **Backend / Echtzeit:** Node.js mit Socket.io (oder WebRTC/Supabase Realtime, je nach optimaler Eignung für Google Antigravity), um echte Multiplayer-Partien (z. B. über einen erstellbaren Raum-Code. 
+Lobby Beispiel siehe UNO) zu ermöglichen.
+
+- **Design & UI/UX:** 
+  - Stil: Edles, modernes "Casino- / Kaminabend"-Ambiente (dunkler Filz-Hintergrund in Dunkelgrün oder edlem Dunkelblau, goldene/helle Akzente).
+  - Layout: Ein runder Tisch (Circular Layout), bei dem die Spieler im Kreis angeordnet sind.
+  - Animationen: Flüssige Karten-Ausspiel-Animationen, Hover-Effekte auf spielbaren Karten, klare Hervorhebung des aktiven Spielers.
+  - Dashboard & Abrechnung: Permanente Anzeige der aktuellen Kassa (Pot) in Euro sowie eine übersichtliche Abrechnungstabelle (Wer hat wie viel pro Runde und im gesamten Spiel bezahlt?).
+
+## Spielregeln & Setup (Der Runde Tisch)
+- **Spieler:** Multiplayer-Modus für bis zu 4 Spieler (jeder an seinem eigenen Gerät via Webbrowser).
+- **Kartendeck:** 32 Blatt (Skat-Blatt: 7 bis Ass in den Farben Karo, Herz, Pik, Kreuz).
+- **Austeilen:** Jeder der 4 Spieler erhält exakt 8 Karten (32 Karten gesamt, keine Karte bleibt übrig).
+- **Ablauf:** Das Spiel besteht aus exakt 6 aufeinanderfolgenden Runden mit unterschiedlichen Strafkategorien.
+
+### Die 6 Runden im Detail & Kassa-Logik:
+*WICHTIG:* Sobald in einer Runde die Marke von **8 €** in der Kassa erreicht/überschritten ist (oder nach Beendigung aller Stiche der Runde), wird die Runde beendet und abgerechnet.
+
+1. **Runde 1 (Keine Stiche):** 
+   - Ziel: Man soll keinen einzigen Stich machen.
+   - Strafe: Für jeden gemachten Stich zahlt man **1 €** in die Kassa.
+2. **Runde 2 (Keine Herzen):**
+   - Ziel: Keine Herzen in den eigenen Stichen haben.
+   - Strafe: Für jedes Herz im Stich zahlt man **1 €** in die Kassa.
+3. **Runde 3 (Keine Damen):**
+   - Ziel: Keine Damen (alle 4 Damen) in den Stichen haben.
+   - Strafe: Für jede Dame im Stich zahlt man **2 €** in die Kassa.
+4. **Runde 4 (Keine Asse):**
+   - Ziel: Keine Asse (alle 4 Assa) in den Stichen haben.
+   - Strafe: Für jedes Ass im Stich zahlt man **2 €** in die Kassa.
+5. **Runde 5 (Erster und Letzter Stich):**
+   - Ziel: Weder den allerersten noch den allerletzten Stich der Runde machen.
+   - Strafe: Wer den ersten oder den letzten Stich macht, zahlt jeweils **4 €** in die Kassa.
+6. **Runde 6 (Der Herz-König):**
+   - Ziel: Den Stich mit dem Herz-König vermeiden.
+   - Strafe: Wer den Herz-König fängt/bekommt, zahlt **8 €** in die Kassa.
+
+## Kern-Features der WebApp
+1. **Lobby & Raum-System:** Spieler können einen Raum erstellen (Room-Code) oder beitreten, um mit Freunden im Multiplayer zu spielen.
+2. **Spiellogik & Farbbedienpflicht:** Automatische Validierung der Züge (Farbbedienpflicht: muss angespielte Farbe bedienen, sofern vorhanden).
+3. **Kassa- & Abrechnungs-UI:** 
+   - Anzeige der Kassa in der Tischmitte.
+   - Nach jeder Runde (spätestens bei Erreichen der 8 € Kassa-Summe) öffnet sich ein Abrechnungsfenster: **"Wie viel hat welcher Spieler in dieser Runde bezahlt?"** sowie eine **Gesamtsumme (Total pro Spieler im gesamten Spiel)**.
+4. **Responsive Design:** Perfekt optimiert für Desktop, Tablets und Smartphones im Browser.
+
+Bitte liefere die komplette Architektur und den Code für diesen Multiplayer-Ansatz.
+
+```
+

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Herzeln – Der Runde Tisch (Multiplayer)</title>
+  <meta name="screen-orientation" content="portrait">
+  <meta name="x5-orientation" content="portrait">
+  <meta name="theme-color" content="#0b0f19">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cards.css">
+</head>
+<body>
+
+  <!-- Background Animated Glow -->
+  <div class="bg-glow"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <div id="app" class="app-container">
+
+    <!-- ================= 1. LOGIN / RAUM-ERSTELLEN SCREEN ================= -->
+    <section id="login-screen" class="screen active">
+      <div class="card-glass login-box">
+        <div class="logo-title">
+          <span class="letter">H</span>
+          <span class="letter">E</span>
+          <span class="letter">R</span>
+          <span class="letter">Z</span>
+          <span class="letter">E</span>
+          <span class="letter">L</span>
+          <span class="letter">N</span>
+        </div>
+        <p class="subtitle">♥️ Der Runde Tisch • 6 Runden • 8 € Kassa 👑</p>
+
+        <div class="form-group">
+          <label for="player-name-input">Dein Spielername</label>
+          <input type="text" id="player-name-input" placeholder="z. B. Alex" maxlength="12" autocomplete="off">
+        </div>
+
+        <div class="action-buttons">
+          <button id="btn-create-room" class="btn btn-primary btn-glow">
+            <span class="icon">✨</span> Raum Erstellen
+          </button>
+
+          <div class="divider"><span>ODER</span></div>
+
+          <div class="join-group">
+            <input type="text" id="room-code-input" placeholder="CODE" maxlength="4" style="text-transform: uppercase;">
+            <button id="btn-join-room" class="btn btn-success">Beitreten</button>
+          </div>
+        </div>
+
+        <div class="mt-3 flex justify-center">
+          <button id="btn-login-rules" class="btn btn-secondary text-xs py-1.5 px-3">
+            📖 Spielregeln & 6 Runden ansehen
+          </button>
+        </div>
+
+        <div id="login-error" class="error-message"></div>
+      </div>
+    </section>
+
+    <!-- ================= 2. LOBBY SCREEN ================= -->
+    <section id="lobby-screen" class="screen">
+      <div class="card-glass lobby-box">
+        <header class="lobby-header">
+          <h2>HERZELN LOBBY</h2>
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <button id="btn-lobby-rules" class="btn-icon" title="Spielregeln">📖</button>
+            <button id="btn-share-whatsapp" class="btn-icon btn-whatsapp" title="Raumcode per WhatsApp teilen">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+              </svg>
+            </button>
+            <div class="room-code-badge" id="lobby-room-code-display" title="Klicken zum Kopieren">
+              <span>CODE:</span>
+              <strong id="display-room-code">----</strong>
+              <button id="btn-copy-code" class="btn-icon" style="width:28px;height:28px;font-size:0.9rem;" title="Code kopieren">📋</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="players-section">
+          <h3>Spieler am Tisch (<span id="player-count">0</span>/4)</h3>
+          <ul id="players-list" class="players-grid">
+            <!-- Dynamische Spieler-Karten untereinander -->
+          </ul>
+          <p id="lobby-bot-hint" class="bot-hint-text">⏳ Warte auf alle 4 Spieler (0/4 im Raum)...</p>
+        </div>
+
+        <div class="lobby-footer">
+          <button id="btn-toggle-ready" class="btn btn-secondary">
+            Ready schalten
+          </button>
+          <button id="btn-start-game" class="btn btn-success btn-glow" style="display: none;">
+            Spiel Starten 🚀
+          </button>
+          <button id="btn-leave-lobby" class="btn btn-danger">
+            Verlassen
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. HERZELN PORTRAIT GAME SCREEN ================= -->
+    <section id="game-screen" class="screen">
+
+      <!-- 3.1 Kompakter Top-Header -->
+      <header class="herzeln-top-hud">
+        <div class="hud-left-group">
+          <span class="room-pill">Raum <strong id="hud-room-code">----</strong></span>
+          <span class="round-pill" id="hud-round-badge">Runde 1/6</span>
+        </div>
+        <div class="hud-right-group">
+          <button id="btn-open-scoreboard" class="hud-btn hud-btn-gold" title="Kassa & Abrechnungstabelle öffnen">
+            💶 <span>Kassa</span>
+          </button>
+          <button id="btn-toggle-deck-style" class="hud-btn" title="Kartenblatt wechseln (Französisch / Doppeldeutsch)">
+            🃏
+          </button>
+          <button id="btn-toggle-sound" class="hud-btn" title="Ton an/aus">
+            🔊
+          </button>
+          <button id="btn-open-rules" class="hud-btn" title="Spielregeln">
+            📖
+          </button>
+          <button id="btn-toggle-fullscreen" class="hud-btn" title="Vollbild">
+            ⛶
+          </button>
+          <button id="btn-leave-game" class="hud-btn hud-btn-danger" title="Spiel verlassen">
+            ✖
+          </button>
+        </div>
+      </header>
+
+      <!-- 3.2 Aktuelle Runden-Disziplin & Kassa-Fortschritts-Leiste -->
+      <div class="round-discipline-bar">
+        <div class="discipline-info">
+          <span id="round-icon" class="discipline-icon">🚫</span>
+          <div class="discipline-texts">
+            <div class="discipline-title-row">
+              <strong id="round-title">Runde 1: Keine Stiche</strong>
+              <span id="trick-counter-badge" class="trick-badge">Stich 1/8</span>
+            </div>
+            <span id="round-penalty-desc" class="discipline-sub">1,00 € Strafe pro gemachtem Stich</span>
+          </div>
+        </div>
+        <div class="kassa-mini-box" id="kassa-mini-trigger" title="Zur Abrechnungstabelle">
+          <div class="kassa-row">
+            <span class="kassa-label">Runden-Kassa:</span>
+            <strong id="round-pot-value" class="kassa-amount">0,00 € / 8,00 €</strong>
+          </div>
+          <div class="kassa-progress-track">
+            <div id="round-pot-bar" class="kassa-progress-fill" style="width: 0%;"></div>
+          </div>
+          <div class="kassa-total-row">
+            <span>Gesamt-Kassa im Spiel:</span>
+            <strong id="total-pot-value">0,00 €</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3.3 Der Runde Tisch (Hochformat-Oval für 4 Spieler) -->
+      <div class="table-stage">
+        <div id="casino-table" class="casino-felt-table">
+
+          <!-- Goldener Innenring des Tisches -->
+          <div class="table-inner-ring"></div>
+
+          <!-- GEGENSPIELER OBEN (NORD) -->
+          <div id="seat-top" class="table-seat seat-top">
+            <div class="opponent-badge" id="badge-top">
+              <div class="opp-header">
+                <span class="opp-avatar" id="avatar-top">N</span>
+                <span class="opp-name" id="name-top">Spieler 3</span>
+                <span class="opp-cards-count" id="cards-top">8 🂠</span>
+              </div>
+              <div class="opp-stats">
+                <span id="tricks-top">0 St.</span>
+                <span class="opp-euro" id="paid-top">0 € (Ges: 0 €)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GEGENSPIELER LINKS (WEST) -->
+          <div id="seat-left" class="table-seat seat-left">
+            <div class="opponent-badge opponent-side" id="badge-left">
+              <div class="opp-header">
+                <span class="opp-avatar" id="avatar-left">W</span>
+                <span class="opp-name" id="name-left">Spieler 2</span>
+              </div>
+              <div class="opp-stats-col">
+                <span class="opp-cards-count" id="cards-left">8 🂠</span>
+                <span id="tricks-left">0 St.</span>
+                <span class="opp-euro" id="paid-left">0 €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GEGENSPIELER RECHTS (OST) -->
+          <div id="seat-right" class="table-seat seat-right">
+            <div class="opponent-badge opponent-side" id="badge-right">
+              <div class="opp-header">
+                <span class="opp-avatar" id="avatar-right">O</span>
+                <span class="opp-name" id="name-right">Spieler 4</span>
+              </div>
+              <div class="opp-stats-col">
+                <span class="opp-cards-count" id="cards-right">8 🂠</span>
+                <span id="tricks-right">0 St.</span>
+                <span class="opp-euro" id="paid-right">0 €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TISCHMITTE: KASSA-MEDAILLON & 4 STICH-KARTEN -->
+          <div id="table-center" class="table-center-zone">
+            <!-- Kassa-Anzeige direkt in der Tischmitte -->
+            <div class="center-kassa-medallion" id="center-kassa-btn" title="Klicken für Kassa-Abrechnung">
+              <span class="medallion-icon">🪙</span>
+              <span class="medallion-text">Kassa: <strong id="center-pot-text">0,00 €</strong> <small>/ 8 €</small></span>
+            </div>
+
+            <!-- Kreuzförmige Ablage für die 4 Karten des aktuellen Stichs -->
+            <div class="trick-cross-area">
+              <div class="trick-slot slot-top" id="trick-slot-top"></div>
+              <div class="trick-slot slot-left" id="trick-slot-left"></div>
+              <div class="trick-slot slot-right" id="trick-slot-right"></div>
+              <div class="trick-slot slot-bottom" id="trick-slot-bottom"></div>
+            </div>
+
+            <!-- Einblendung bei Stich-Auflösung -->
+            <div id="trick-winner-banner" class="trick-winner-banner hidden">
+              <div class="winner-banner-title" id="trick-winner-text">Spieler gewinnt den Stich!</div>
+              <div class="winner-banner-penalty" id="trick-penalty-text">+1,00 € in die Kassa</div>
+            </div>
+          </div>
+
+          <!-- EIGENER SPIELER STATUS UNTEN AM TISCH (SÜD) -->
+          <div id="seat-bottom" class="table-seat seat-bottom">
+            <div class="my-seat-bar" id="badge-bottom">
+              <div class="my-seat-left">
+                <span class="opp-avatar my-avatar" id="avatar-bottom">D</span>
+                <div>
+                  <div class="my-name-line">
+                    <strong id="name-bottom">Du</strong>
+                    <span id="turn-status-pill" class="turn-pill">Warten...</span>
+                  </div>
+                  <div class="my-sub-stats">
+                    <span id="tricks-bottom">Stiche: 0</span>
+                    <span>•</span>
+                    <span id="paid-round-bottom" class="text-amber-300">Runde: 0,00 €</span>
+                    <span>•</span>
+                    <span id="paid-total-bottom" class="text-emerald-300">Gesamt: 0,00 €</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3.4 Eigene Handkarten-Leiste (Unten, alle 8 Karten im Portrait-Blickfeld) -->
+      <div class="my-hand-section">
+        <div class="hand-helper-row">
+          <span id="hand-hint-text" class="hand-hint">Tippe auf eine hervorgehobene Karte zum Ausspielen</span>
+          <span id="lead-suit-indicator" class="lead-suit-pill">Freies Ausspielen</span>
+        </div>
+        <div id="my-hand-cards" class="hand-cards-fan">
+          <!-- Bis zu 8 Handkarten dynamisch gerendert -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= 4. KASSA & RUNDEN-ABRECHNUNGS MODAL ================= -->
+    <div id="scoreboard-modal" class="modal-backdrop hidden">
+      <div class="modal-card card-glass">
+        <div class="modal-header-row">
+          <div>
+            <h3 id="scoreboard-modal-title" class="modal-title">💶 Kassa & Abrechnung</h3>
+            <p id="scoreboard-modal-subtitle" class="modal-subtitle">Übersicht aller Zahlungen pro Runde und Gesamt</p>
+          </div>
+          <button id="btn-close-scoreboard" class="btn-modal-close" title="Schließen">&times;</button>
+        </div>
+
+        <!-- Hinweis-Banner bei Rundenende (insb. bei Erreichen der 8 € Marke) -->
+        <div id="round-end-alert" class="round-end-alert hidden">
+          <div class="alert-headline" id="round-end-headline">🔔 Runde 1 beendet – 8,00 € erreicht!</div>
+          <div class="alert-subtext" id="round-end-subtext">Alle Strafbeträge dieser Runde wurden in die Kassa eingezahlt.</div>
+        </div>
+
+        <!-- Aktuelle Runden-Abrechnung: Wer hat in dieser Runde wie viel bezahlt? -->
+        <div class="current-round-summary-box">
+          <div class="summary-box-header">
+            <span id="summary-round-label">Aktuelle Runde (Runde 1: Keine Stiche)</span>
+            <span id="summary-round-pot" class="summary-pot-badge">Runden-Kassa: 0,00 € / 8,00 €</span>
+          </div>
+          <div id="current-round-payments-list" class="round-payments-grid">
+            <!-- Dynamische Karten pro Spieler für diese Runde -->
+          </div>
+        </div>
+
+        <!-- Komplette Abrechnungstabelle über alle 6 Runden + Gesamtsumme -->
+        <div class="full-table-wrapper">
+          <h4 class="table-section-heading">📊 Gesamtabrechnung (Runde 1 bis 6)</h4>
+          <div class="table-scroll-container">
+            <table class="herzeln-score-table">
+              <thead>
+                <tr>
+                  <th class="text-left">Spieler</th>
+                  <th title="Runde 1: Keine Stiche (1€)">R1<br><small>🚫</small></th>
+                  <th title="Runde 2: Keine Herzen (1€)">R2<br><small>♥</small></th>
+                  <th title="Runde 3: Keine Damen (2€)">R3<br><small>👸</small></th>
+                  <th title="Runde 4: Keine Asse (2€)">R4<br><small>🅰️</small></th>
+                  <th title="Runde 5: 1. & 8. Stich (4€)">R5<br><small>⚡</small></th>
+                  <th title="Runde 6: Herz-König (8€)">R6<br><small>👑</small></th>
+                  <th class="text-right total-col-header">Gesamt</th>
+                </tr>
+              </thead>
+              <tbody id="scoreboard-table-body">
+                <!-- Dynamische Zeilen für alle 4 Spieler -->
+              </tbody>
+              <tfoot>
+                <tr class="kassa-sum-row">
+                  <td colspan="7" class="text-right font-bold">💰 Gesamte Kassa (Pot aller Runden):</td>
+                  <td id="table-total-pot" class="text-right font-extrabold text-amber-400">0,00 €</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Siegerehrung am Spielende (nach Runde 6) -->
+        <div id="game-over-podium" class="game-over-podium hidden">
+          <div class="podium-title">🏆 Endstand nach 6 Runden 🏆</div>
+          <div id="podium-winner-text" class="podium-winner"></div>
+        </div>
+
+        <!-- Modal Footer Buttons -->
+        <div class="modal-footer-actions">
+          <button id="btn-next-round" class="btn btn-success btn-glow w-full hidden">
+            Nächste Runde starten 🚀
+          </button>
+          <button id="btn-restart-game" class="btn btn-primary btn-glow w-full hidden">
+            🔄 Neues Spiel (Alle 6 Runden neu starten)
+          </button>
+          <button id="btn-dismiss-scoreboard" class="btn btn-success">
+            Zurück zum Tisch
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 5. SPIELREGELN MODAL ================= -->
+    <div id="rules-modal" class="modal-backdrop hidden">
+      <div class="modal-card card-glass">
+        <div class="modal-header-row">
+          <div>
+            <h3 class="modal-title">📖 Herzeln – Spielregeln</h3>
+            <p class="modal-subtitle">Der Runde Tisch (32 Blatt • 4 Spieler • 6 Runden)</p>
+          </div>
+          <button id="btn-close-rules" class="btn-modal-close">&times;</button>
+        </div>
+
+        <div class="rules-content-scroll">
+          <div class="rule-block">
+            <h4>🃏 Grundregeln & Farbbedienpflicht</h4>
+            <ul>
+              <li>Gespielt wird zu viert am runden Tisch mit <strong>32 Karten</strong> (7, 8, 9, 10, Bube, Dame, König, Ass in Kreuz ♣, Pik ♠, Herz ♥, Karo ♦). Jeder erhält <strong>8 Karten</strong>.</li>
+              <li><strong>Rangfolge:</strong> 7 (niedrigste) &lt; 8 &lt; 9 &lt; 10 &lt; Bube &lt; Dame &lt; König &lt; Ass (höchste). Es gibt <strong>keinen Trumpf</strong>.</li>
+              <li><strong>Farbbedienpflicht:</strong> Die zuerst ausgespielte Karte bestimmt die Farbe des Stichs. Jeder Spieler <strong>muss diese Farbe bedienen</strong>, sofern er sie auf der Hand hat! Nur wer die Farbe nicht hat, darf eine beliebige andere Karte abwerfen.</li>
+              <li><strong>Rundenende bei 8,00 €:</strong> In jeder Runde landen exakt <strong>8,00 €</strong> in der Kassa. Sobald die 8,00 € in einer Runde voll sind, endet die Runde sofort und es wird abgerechnet!</li>
+            </ul>
+          </div>
+
+          <div class="rule-block">
+            <h4>💰 Die 6 Runden im Überblick</h4>
+            <div class="rounds-rule-grid">
+              <div class="round-rule-item">
+                <strong>1. Keine Stiche 🚫</strong>
+                <span>Keinen Stich machen! Jeder gemachte Stich kostet <strong>1,00 €</strong>.</span>
+              </div>
+              <div class="round-rule-item">
+                <strong>2. Keine Herzen ♥</strong>
+                <span>Keine Herzen fangen! Jedes Herz im Stich kostet <strong>1,00 €</strong>. <em>(Herz darf nicht ausgespielt werden, außer man hat keine andere Farbe mehr.)</em></span>
+              </div>
+              <div class="round-rule-item">
+                <strong>3. Keine Damen 👸</strong>
+                <span>Keine Damen fangen! Jede Dame im Stich kostet <strong>2,00 €</strong>.</span>
+              </div>
+              <div class="round-rule-item">
+                <strong>4. Keine Asse 🅰️</strong>
+                <span>Keine Asse fangen! Jedes Ass im Stich kostet <strong>2,00 €</strong>.</span>
+              </div>
+              <div class="round-rule-item">
+                <strong>5. Erster & Letzter Stich ⚡</strong>
+                <span>Weder den 1. noch den 8. Stich machen! Kosten jeweils <strong>4,00 €</strong>.</span>
+              </div>
+              <div class="round-rule-item">
+                <strong>6. Der Herz-König 👑</strong>
+                <span>Den Herz-König (♥K) vermeiden! Wer ihn fängt, zahlt <strong>8,00 €</strong>. <em>(Herz darf nicht ausgespielt werden, außer man hat keine andere Farbe mehr.)</em></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button id="btn-close-rules-bottom" class="btn btn-primary w-full">Verstanden 👍</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 6. ROTATE DEVICE OVERLAY (PORTRAIT ONLY) ================= -->
+    <div id="rotate-overlay" class="rotate-overlay" aria-hidden="true">
+      <div class="card-glass rotate-box">
+        <div class="rotate-icon">📱↻</div>
+        <h2>Nur Portrait-Layout möglich</h2>
+        <p class="text-amber-300 font-semibold text-sm my-1">Landscape-Layout ist auf dem Smartphone gesperrt!</p>
+        <p class="text-xs text-slate-300 mt-2">Bitte halte dein Handy aufrecht im <strong>Hochformat (Portrait)</strong>, um Herzeln optimal am runden Tisch zu spielen.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/shared/constants/lobbyEvents.js"></script>
+  <script src="js/lobbyConfig.js"></script>
+  <script src="js/socketClient.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/lobbyApp.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+

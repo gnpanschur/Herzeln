@@ -1,0 +1,23 @@
+{
+  "name": "herzeln-multiplayer",
+  "version": "1.0.0",
+  "description": "Echtzeit-Multiplayer Kartenspiel Herzeln (Der Runde Tisch) mit Node.js & Socket.io (Render Ready)",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "keywords": [
+    "herzeln",
+    "kartenspiel",
+    "multiplayer",
+    "socket.io",
+    "casino"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}

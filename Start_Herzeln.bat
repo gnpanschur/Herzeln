@@ -1,0 +1,8 @@
+@echo off
+title Herzeln Multiplayer Server
+cd /d "%~dp0"
+echo Starte Herzeln Multiplayer Server auf http://localhost:3000 ...
+start "" http://localhost:3000
+node server/server.js
+pause
+
