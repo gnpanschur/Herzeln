@@ -5,6 +5,22 @@ class SoundManager {
   constructor() {
     this.enabled = true;
     this.ctx = null;
+    this.cardAudioPool = [];
+    this.poolSize = 4;
+    this.poolIndex = 0;
+    this.initCardAudio();
+  }
+
+  initCardAudio() {
+    try {
+      for (let i = 0; i < this.poolSize; i++) {
+        const audio = new Audio('audio/KarteAuf.mp3');
+        audio.preload = 'auto';
+        this.cardAudioPool.push(audio);
+      }
+    } catch (e) {
+      // Fallback auf AudioContext
+    }
   }
 
   initContext() {
@@ -26,6 +42,28 @@ class SoundManager {
 
   playCardSnap() {
     if (!this.enabled) return;
+
+    if (this.cardAudioPool && this.cardAudioPool.length > 0) {
+      try {
+        const audio = this.cardAudioPool[this.poolIndex];
+        this.poolIndex = (this.poolIndex + 1) % this.cardAudioPool.length;
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            this.playSynthesizedSnap();
+          });
+        }
+        return;
+      } catch (err) {
+        // Fallback
+      }
+    }
+
+    this.playSynthesizedSnap();
+  }
+
+  playSynthesizedSnap() {
     this.initContext();
     if (!this.ctx) return;
 
