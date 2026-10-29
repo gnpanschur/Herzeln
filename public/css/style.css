@@ -1075,8 +1075,8 @@ input[type="text"]:focus {
 
 .domino-grid-4x8 {
   display: grid;
-  grid-template-columns: repeat(4, var(--domino-cell-w, 56px));
-  grid-template-rows: repeat(8, var(--domino-cell-h, 34px));
+  grid-template-columns: repeat(4, var(--domino-cell-w, 68px));
+  grid-template-rows: repeat(8, var(--domino-cell-h, 42px));
   gap: 2px 5px;
   padding: 4px 6px;
   background: rgba(0, 0, 0, 0.24);
@@ -1086,8 +1086,8 @@ input[type="text"]:focus {
 
 .domino-cell {
   position: relative;
-  width: var(--domino-cell-w, 56px);
-  height: var(--domino-cell-h, 34px);
+  width: var(--domino-cell-w, 68px);
+  height: var(--domino-cell-h, 42px);
   border-radius: 5px;
   border: 1px dashed rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.03);
@@ -1110,7 +1110,7 @@ input[type="text"]:focus {
 }
 
 .domino-cell-placeholder {
-  font-size: 0.56rem;
+  font-size: 0.66rem;
   font-weight: 800;
   color: rgba(255, 255, 255, 0.25);
   letter-spacing: 0.3px;
@@ -1122,8 +1122,8 @@ input[type="text"]:focus {
 
 /* Quer liegende Karte im 4x8 Gitter (exakt wie in Deck.jpg!) */
 .domino-card-horizontal {
-  width: var(--domino-cell-h, 34px);
-  height: var(--domino-cell-w, 56px);
+  width: var(--domino-cell-h, 42px);
+  height: var(--domino-cell-w, 68px);
   transform: rotate(-90deg);
   border-radius: 4px;
   background: #fff;
