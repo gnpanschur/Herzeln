@@ -652,8 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const isWinner = winningCardId && play.card.id === winningCardId;
       const cardEl = createCardElement(play.card, state.roundNumber, {
-        extraClass: `trick-card ${isWinner ? 'winning-trick-card' : ''}`,
-        playerTag: play.playerName
+        extraClass: `trick-card ${isWinner ? 'winning-trick-card' : ''}`
       });
       slot.appendChild(cardEl);
     });
