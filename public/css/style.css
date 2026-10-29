@@ -515,17 +515,9 @@ input[type="text"]:focus {
   color: #fca5a5;
 }
 
-/* 3.2 Runden-Disziplin & Kassa-Bar */
+/* 3.2 (round-discipline-bar entfernt für aufgeräumtere Ansicht) */
 .round-discipline-bar {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 0.35rem;
-  background: linear-gradient(135deg, rgba(20, 30, 50, 0.92), rgba(15, 23, 42, 0.92));
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: 12px;
-  padding: 0.35rem 0.55rem;
-  flex-shrink: 0;
+  display: none !important;
 }
 
 .discipline-info {

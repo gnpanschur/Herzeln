@@ -420,10 +420,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderGameState(state) {
     const totalRounds = state.totalRounds || 7;
-    if (hudRoomCode) hudRoomCode.textContent = state.roomCode || '----';
-    if (hudRoundBadge) hudRoundBadge.textContent = `Runde ${state.roundNumber}/${totalRounds}`;
-
     const rCfg = state.roundConfig || {};
+    if (hudRoomCode) hudRoomCode.textContent = state.roomCode || '----';
+    if (hudRoundBadge) {
+      const shortName = rCfg.shortTitle || rCfg.title || '';
+      hudRoundBadge.textContent = shortName
+        ? `R${state.roundNumber}/${totalRounds}: ${rCfg.icon || ''} ${shortName}`
+        : `Runde ${state.roundNumber}/${totalRounds}`;
+    }
+
     if (roundIconEl) roundIconEl.textContent = rCfg.icon || '🃏';
     if (roundTitleEl) roundTitleEl.textContent = `R${state.roundNumber}: ${rCfg.title || ''}`;
 
