@@ -699,7 +699,7 @@ input[type="text"]:focus {
 
 /* Gegner-Plaketten */
 .opponent-badge {
-  background: rgba(11, 15, 25, 0.82);
+  background: rgba(11, 15, 25, 0.5);
   border: 1.5px solid rgba(255, 255, 255, 0.18);
   border-radius: 12px;
   padding: 0.25rem 0.55rem;
@@ -793,13 +793,14 @@ input[type="text"]:focus {
 
 /* Eigener Sitzplatz unten am Tisch */
 .my-seat-bar {
-  background: rgba(11, 15, 25, 0.86);
+  background: rgba(11, 15, 25, 0.5);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 13px;
   padding: 0.3rem 0.65rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  backdrop-filter: blur(8px);
   transition: all 0.25s ease;
 }
 
