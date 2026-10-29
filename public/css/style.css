@@ -1184,11 +1184,7 @@ input[type="text"]:focus {
 }
 
 .hand-helper-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.3rem;
-  padding: 0 0.2rem;
+  display: none !important;
 }
 
 .hand-hint {
