@@ -8,6 +8,8 @@
   --hand-card-h: 88px;
   --trick-card-w: 58px;
   --trick-card-h: 88px;
+  --domino-cell-w: 56px;
+  --domino-cell-h: 34px;
 }
 
 @media (max-width: 380px) {
@@ -16,6 +18,8 @@
     --hand-card-h: 78px;
     --trick-card-w: 52px;
     --trick-card-h: 79px;
+    --domino-cell-w: 50px;
+    --domino-cell-h: 30px;
   }
 }
 
@@ -25,6 +29,8 @@
     --hand-card-h: 94px;
     --trick-card-w: 60px;
     --trick-card-h: 90px;
+    --domino-cell-w: 60px;
+    --domino-cell-h: 36px;
   }
 }
 

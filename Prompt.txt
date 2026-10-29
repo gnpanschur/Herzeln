@@ -58,5 +58,34 @@ Lobby Beispiel siehe UNO) zu ermöglichen.
 
 Bitte liefere die komplette Architektur und den Code für diesen Multiplayer-Ansatz.
 
-```
+-------------------------------------------------------------
+Das Letzte Spiel hinter den anderen:
+Das nächste Spiel ist „Unteranlegen“ (auch bekannt als „Siebener raus“ oder „Dominos“). Programmiere mir die vollständige Spiellogik basierend auf folgenden Regeln:
+
+1. KARTEN & VERTEILUNG
+- Alle Karten werden zu Beginn des Spiels gleichmäßig an alle Spieler (z. B. 4 Spieler) verteilt.
+
+2. SPIELSTART & ANLEGEN
+- Das Spiel beginnt zwingend mit dem Auslegen einer bestimmten Startkarte in der Tischmitte (kreuz-Bube). Der Spieler, der diese Karte besitzt, macht automatisch den ersten Zug.
+- Gespielt wird im Uhrzeigersinn.
+- In jedem Zug darf ein Spieler genau eine Karte regelkonform auf dem Tisch ablegen.
+
+3. DIE ANLEGE-REGELN
+Karten werden in Reihen auf dem Tisch nach Farbe (Symbol) und Wert sortiert abgelegt:
+- In die Breite: Ein Spieler kann eine Reihe für eine neue Farbe eröffnen, indem er den entsprechenden Unter (oder Buben) dieser Farbe ablegt.
+- In die Länge: Ein Spieler kann eine Karte an eine bereits existierende Reihe anlegen. Die Karte muss dieselbe Farbe haben und den Wert der Reihe entweder direkt nach oben (z. B. Ober -> König -> Ass) oder direkt nach unten (z. B. 10 -> 9 -> 8 -> 7) fortführen.
+- Passen: Hat ein Spieler keine spielbare Karte auf der Hand, muss er passen und der nächste Spieler ist an der Reihe.
+
+4. GEWINNBEDINGUNGEN & PLATZIERUNGEN
+- Das Spiel endet nicht sofort, wenn der erste Spieler fertig ist. Es wird so lange weitergespielt, bis alle Spieler ihre Karten abgelegt haben.
+- Sobald ein Spieler seine letzte Karte regelkonform abgelegt hat, scheidet er aus dem laufenden Spiel aus und sichert sich den nächsten freien Platz.
+- Der erste Spieler, der fertig ist, belegt Platz 1 (Gewinner).
+- Der zweite Spieler belegt Platz 2, der dritte Platz 3.
+- Der Spieler, der als Allerletzter seine finale Karte ablegt, verliert das Spiel und belegt den letzten Platz.
+Der erste Platz bekommt 24€ aus der Kassa, der 2. Platz bekommt 16€ aus der Kassa, der 3. Platz bekommt 8€ aus der Kassa.
+
+Auflegen Richtung siehe Bild Deck.jpg
+
+
+
 

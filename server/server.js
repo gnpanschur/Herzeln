@@ -114,6 +114,24 @@ io.on('connection', (socket) => {
     if (typeof callback === 'function') callback(result);
   });
 
+  // Passen in Runde 7 (Unteranlegen), wenn keine Karte angelegt werden kann
+  socket.on('pass_domino', (callback) => {
+    const code = lobbyManager.socketToRoomMap.get(socket.id);
+    if (!code) {
+      if (typeof callback === 'function') callback({ success: false, message: 'Nicht in einem Raum' });
+      return;
+    }
+
+    const game = games.get(code);
+    if (!game) {
+      if (typeof callback === 'function') callback({ success: false, message: 'Spiel nicht gefunden' });
+      return;
+    }
+
+    const result = game.passDominoTurn(socket.id);
+    if (typeof callback === 'function') callback(result);
+  });
+
   // Nächste Runde starten (nach Runden-Abrechnung)
   socket.on('next_round', (callback) => {
     const code = lobbyManager.socketToRoomMap.get(socket.id);

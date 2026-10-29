@@ -36,7 +36,7 @@
           <span class="letter">L</span>
           <span class="letter">N</span>
         </div>
-        <p class="subtitle">♥️ Der Runde Tisch • 6 Runden • 8 € Kassa 👑</p>
+        <p class="subtitle">♥️ Der Runde Tisch • 7 Runden • Kassa & Unteranlegen 👑</p>
 
         <div class="form-group">
           <label for="player-name-input">Dein Spielername</label>
@@ -58,7 +58,7 @@
 
         <div class="mt-3 flex justify-center">
           <button id="btn-login-rules" class="btn btn-secondary text-xs py-1.5 px-3">
-            📖 Spielregeln & 6 Runden ansehen
+            📖 Spielregeln & 7 Runden ansehen
           </button>
         </div>
 
@@ -115,7 +115,7 @@
       <header class="herzeln-top-hud">
         <div class="hud-left-group">
           <span class="room-pill">Raum <strong id="hud-room-code">----</strong></span>
-          <span class="round-pill" id="hud-round-badge">Runde 1/6</span>
+          <span class="round-pill" id="hud-round-badge">Runde 1/7</span>
         </div>
         <div class="hud-right-group">
           <button id="btn-open-scoreboard" class="hud-btn hud-btn-gold" title="Kassa & Abrechnungstabelle öffnen">
@@ -241,15 +241,27 @@
             </div>
           </div>
 
+          <!-- RUNDE 7 (UNTERANLEGEN): 4x8 ANLEGE-GITTER WIE IN DECK.JPG -->
+          <div id="domino-board-zone" class="domino-board-zone hidden">
+            <div id="domino-action-banner" class="domino-action-banner">
+              Start mit Kreuz-Bube (♣B)
+            </div>
+            <div id="domino-grid" class="domino-grid-4x8">
+              <!-- 4 Spalten (Kreuz, Pik, Herz, Karo) x 8 Zeilen (Ass bis 7) -->
+            </div>
+          </div>
+
           <!-- EIGENER SPIELER STATUS UNTEN AM TISCH (SÜD) -->
           <div id="seat-bottom" class="table-seat seat-bottom">
+            <div class="turn-pill-wrapper">
+              <span id="turn-status-pill" class="turn-pill">Warten...</span>
+            </div>
             <div class="my-seat-bar" id="badge-bottom">
               <div class="my-seat-left">
                 <span class="opp-avatar my-avatar" id="avatar-bottom">D</span>
                 <div>
                   <div class="my-name-line">
                     <strong id="name-bottom">Du</strong>
-                    <span id="turn-status-pill" class="turn-pill">Warten...</span>
                   </div>
                   <div class="my-sub-stats">
                     <span id="tricks-bottom">Stiche: 0</span>
@@ -272,6 +284,12 @@
           <span id="hand-hint-text" class="hand-hint">Tippe auf eine hervorgehobene Karte zum Ausspielen</span>
           <span id="lead-suit-indicator" class="lead-suit-pill">Freies Ausspielen</span>
         </div>
+        <!-- Passen-Button für Runde 7 (Unteranlegen), falls keine Karte angelegt werden kann -->
+        <div id="domino-pass-bar" class="domino-pass-bar hidden">
+          <button id="btn-pass-domino" class="btn btn-warning-pass btn-glow w-full">
+            ⏭️ Passen (Keine passende Karte auf der Hand)
+          </button>
+        </div>
         <div id="my-hand-cards" class="hand-cards-fan">
           <!-- Bis zu 8 Handkarten dynamisch gerendert -->
         </div>
@@ -287,7 +305,24 @@
             <h3 id="scoreboard-modal-title" class="modal-title">💶 Kassa & Abrechnung</h3>
             <p id="scoreboard-modal-subtitle" class="modal-subtitle">Übersicht aller Zahlungen pro Runde und Gesamt</p>
           </div>
-          <button id="btn-close-scoreboard" class="btn-modal-close" title="Schließen">&times;</button>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <button id="btn-toggle-bilanz" class="btn-bilanz-header" title="Bilanz anzeigen (Wer bekommt / Wer bezahlt)">
+              ⚖️ Bilanz
+            </button>
+            <button id="btn-close-scoreboard" class="btn-modal-close" title="Schließen">&times;</button>
+          </div>
+        </div>
+
+        <!-- BILANZ-BOX (Wird per Klick auf den "⚖️ Bilanz" Button ein-/ausgeblendet) -->
+        <div id="bilanz-panel" class="bilanz-panel hidden">
+          <div class="bilanz-panel-header">
+            <span>⚖️ Bilanz – Wer bekommt / Wer bezahlt?</span>
+            <small id="bilanz-pot-status">Kassa-Verrechnung</small>
+          </div>
+          <div id="bilanz-players-list" class="bilanz-players-list">
+            <!-- Dynamische Einträge: z.B. Günter bekommt +10 €, Alf bezahlt -8 € -->
+          </div>
+          <div id="bilanz-inline-summary" class="bilanz-inline-summary"></div>
         </div>
 
         <!-- Hinweis-Banner bei Rundenende (insb. bei Erreichen der 8 € Marke) -->
@@ -307,9 +342,9 @@
           </div>
         </div>
 
-        <!-- Komplette Abrechnungstabelle über alle 6 Runden + Gesamtsumme -->
+        <!-- Komplette Abrechnungstabelle über alle 7 Runden + Gesamtsumme -->
         <div class="full-table-wrapper">
-          <h4 class="table-section-heading">📊 Gesamtabrechnung (Runde 1 bis 6)</h4>
+          <h4 class="table-section-heading">📊 Gesamtabrechnung (Runde 1 bis 7)</h4>
           <div class="table-scroll-container">
             <table class="herzeln-score-table">
               <thead>
@@ -321,7 +356,10 @@
                   <th title="Runde 4: Keine Asse (2€)">R4<br><small>🅰️</small></th>
                   <th title="Runde 5: 1. & 8. Stich (4€)">R5<br><small>⚡</small></th>
                   <th title="Runde 6: Herz-König (8€)">R6<br><small>👑</small></th>
-                  <th class="text-right total-col-header">Gesamt</th>
+                  <th class="text-right" title="Summe gezahlt in Runde 1–6 (aktuelles Spiel)">Gezahlt</th>
+                  <th title="Runde 7: Unteranlegen (1.=24€, 2.=16€, 3.=8€)">R7<br><small>🃏</small></th>
+                  <th class="text-right" title="Bilanz aus abgeschlossenen Vor-Spielen">Vor.<br><small>🔄</small></th>
+                  <th class="text-right total-col-header" title="Gesamt-Bilanz (Gezahlt + R7 + Vorspiele)">Bilanz</th>
                 </tr>
               </thead>
               <tbody id="scoreboard-table-body">
@@ -329,17 +367,17 @@
               </tbody>
               <tfoot>
                 <tr class="kassa-sum-row">
-                  <td colspan="7" class="text-right font-bold">💰 Gesamte Kassa (Pot aller Runden):</td>
-                  <td id="table-total-pot" class="text-right font-extrabold text-amber-400">0,00 €</td>
+                  <td colspan="8" class="text-right font-bold">💰 Aktuell in der Kassa (Pot):</td>
+                  <td colspan="3" id="table-total-pot" class="text-right font-extrabold text-amber-400">0,00 €</td>
                 </tr>
               </tfoot>
             </table>
           </div>
         </div>
 
-        <!-- Siegerehrung am Spielende (nach Runde 6) -->
+        <!-- Siegerehrung am Spielende (nach Runde 7) -->
         <div id="game-over-podium" class="game-over-podium hidden">
-          <div class="podium-title">🏆 Endstand nach 6 Runden 🏆</div>
+          <div class="podium-title">🏆 Endstand nach 7 Runden (inkl. Unteranlegen) 🏆</div>
           <div id="podium-winner-text" class="podium-winner"></div>
         </div>
 
@@ -349,7 +387,7 @@
             Nächste Runde starten 🚀
           </button>
           <button id="btn-restart-game" class="btn btn-primary btn-glow w-full hidden">
-            🔄 Neues Spiel (Alle 6 Runden neu starten)
+            🔄 Neues Spiel (Alle 7 Runden neu starten)
           </button>
           <button id="btn-dismiss-scoreboard" class="btn btn-success">
             Zurück zum Tisch
@@ -406,6 +444,11 @@
               <div class="round-rule-item">
                 <strong>6. Der Herz-König 👑</strong>
                 <span>Den Herz-König (♥K) vermeiden! Wer ihn fängt, zahlt <strong>8,00 €</strong>. <em>(Herz darf nicht ausgespielt werden, außer man hat keine andere Farbe mehr.)</em></span>
+              </div>
+              <div class="round-rule-item">
+                <strong>7. Finale: Unteranlegen (Siebener raus / Dominos) 🃏</strong>
+                <span>Startet zwingend mit dem <strong>Kreuz-Buben (♣B)</strong>. In die Breite werden weitere Unter (Buben) ausgelegt, in die Länge wird pro Farbe nach oben (Ober → König → Ass) und nach unten (10 → 9 → 8 → 7) angelegt. Wer nicht anlegen kann, muss passen. Gespielt wird, bis alle fertig sind:<br>
+                🥇 <strong>1. Platz: +24,00 €</strong> • 🥈 <strong>2. Platz: +16,00 €</strong> • 🥉 <strong>3. Platz: +8,00 €</strong> aus der Kassa!</span>
               </div>
             </div>
           </div>
