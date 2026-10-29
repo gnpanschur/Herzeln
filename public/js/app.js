@@ -861,18 +861,24 @@ document.addEventListener('DOMContentLoaded', () => {
       bilanzPanel.classList.remove('hidden');
     }
 
-    if (state.status === 'round_end' || state.status === 'game_over') {
-      roundEndAlert.classList.remove('hidden');
-      if (state.isDominoRound) {
-        roundEndHeadline.textContent = `🏆 Finale (Runde 7: Unteranlegen) beendet!`;
-      } else if (state.endedByPotLimit) {
-        roundEndHeadline.textContent = `🔔 8,00 € Kassa-Limit erreicht – Runde ${state.roundNumber} sofort beendet!`;
+    if (roundEndAlert) {
+      if (state.status === 'round_end' || state.status === 'game_over') {
+        roundEndAlert.classList.remove('hidden');
+        if (roundEndHeadline) {
+          if (state.isDominoRound) {
+            roundEndHeadline.textContent = `🏆 Finale (Runde 7: Unteranlegen) beendet!`;
+          } else if (state.endedByPotLimit) {
+            roundEndHeadline.textContent = `🔔 8,00 € Kassa-Limit erreicht – Runde ${state.roundNumber} sofort beendet!`;
+          } else {
+            roundEndHeadline.textContent = `🔔 Runde ${state.roundNumber} (${rCfg.title}) beendet!`;
+          }
+        }
+        if (roundEndSubtext) {
+          roundEndSubtext.textContent = state.roundEndReason || 'Alle Beträge dieser Runde wurden abgerechnet.';
+        }
       } else {
-        roundEndHeadline.textContent = `🔔 Runde ${state.roundNumber} (${rCfg.title}) beendet!`;
+        roundEndAlert.classList.add('hidden');
       }
-      roundEndSubtext.textContent = state.roundEndReason || 'Alle Beträge dieser Runde wurden abgerechnet.';
-    } else {
-      roundEndAlert.classList.add('hidden');
     }
 
     if (summaryRoundLabel) {
