@@ -190,10 +190,13 @@
 
           <!-- TISCHMITTE: KASSA-MEDAILLON & 4 STICH-KARTEN -->
           <div id="table-center" class="table-center-zone">
-            <!-- Kassa-Anzeige direkt in der Tischmitte -->
+            <!-- Kassa-Anzeige & ausgespielte Farbe direkt in der Tischmitte -->
             <div class="center-kassa-medallion" id="center-kassa-btn" title="Klicken für Kassa-Abrechnung">
-              <span class="medallion-icon">🪙</span>
-              <span class="medallion-text">Kassa: <strong id="center-pot-text">0,00 €</strong> <small>/ 8 €</small></span>
+              <span class="medallion-icon" id="center-lead-suit-icon">🪙</span>
+              <span class="medallion-text">
+                <span id="center-lead-suit-text" class="medallion-lead-suit hidden"></span>
+                <span>Kassa: <strong id="center-pot-text">0,00 €</strong> <small>/ 8 €</small></span>
+              </span>
             </div>
 
             <!-- Kreuzförmige Ablage für die 4 Karten des aktuellen Stichs -->

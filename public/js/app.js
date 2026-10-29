@@ -82,6 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const kassaMiniTrigger = document.getElementById('kassa-mini-trigger');
   const centerKassaBtn = document.getElementById('center-kassa-btn');
   const centerPotText = document.getElementById('center-pot-text');
+  const centerLeadSuitIcon = document.getElementById('center-lead-suit-icon');
+  const centerLeadSuitText = document.getElementById('center-lead-suit-text');
 
   // DOM Elements - Table, Trick & Domino Board
   const casinoTableEl = document.getElementById('casino-table');
@@ -634,7 +636,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function updateCenterLeadSuit(state) {
+    if (!centerLeadSuitIcon || !centerLeadSuitText) return;
+    const trickToDisplay = state.resolvingTrick ? state.resolvingTrick.plays : (state.currentTrick || []);
+
+    if (trickToDisplay.length > 0 && trickToDisplay[0] && trickToDisplay[0].card) {
+      const leadCard = trickToDisplay[0].card;
+      const isRed = leadCard.suit === 'hearts' || leadCard.suit === 'diamonds';
+      centerLeadSuitIcon.textContent = leadCard.suitSymbol || '🪙';
+      centerLeadSuitText.textContent = `${leadCard.suitSymbol} ${leadCard.suitName}`;
+      centerLeadSuitText.className = `medallion-lead-suit ${isRed ? 'suit-red' : 'suit-black'}`;
+    } else {
+      centerLeadSuitIcon.textContent = '🪙';
+      centerLeadSuitText.textContent = '';
+      centerLeadSuitText.className = 'medallion-lead-suit hidden';
+    }
+  }
+
   function renderCenterTrick(state) {
+    updateCenterLeadSuit(state);
     Object.values(trickSlots).forEach(slot => {
       if (slot) slot.innerHTML = '';
     });

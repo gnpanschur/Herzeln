@@ -904,6 +904,33 @@ input[type="text"]:focus {
   color: #94a3b8;
 }
 
+.medallion-text {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.medallion-lead-suit {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.08rem 0.4rem;
+  border-radius: 99px;
+  font-weight: 800;
+  font-size: 0.76rem;
+  letter-spacing: 0.2px;
+}
+
+.medallion-lead-suit.suit-red {
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.medallion-lead-suit.suit-black {
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: rgba(56, 189, 248, 0.18);
+}
+
 /* Kreuzförmige Anordnung der 4 gespielten Karten im Stich */
 .trick-cross-area {
   position: relative;
