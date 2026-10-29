@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
             : `Σ -${formatEuroShort(player.totalPaid)}`;
         }
       } else {
-        if (tricksEl) tricksEl.textContent = `${player.tricksWon} St.`;
+        if (tricksEl) tricksEl.textContent = `${player.tricksWon} Stiche`;
         if (paidEl) {
           if (pos === 'top') {
             paidEl.textContent = `${formatEuroShort(player.roundPaid)} (Ges: ${formatEuroShort(player.totalPaid)})`;
