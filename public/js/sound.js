@@ -6,17 +6,23 @@ class SoundManager {
     this.enabled = true;
     this.ctx = null;
     this.cardAudioPool = [];
+    this.trickAudioPool = [];
     this.poolSize = 4;
     this.poolIndex = 0;
-    this.initCardAudio();
+    this.trickPoolIndex = 0;
+    this.initAudioFiles();
   }
 
-  initCardAudio() {
+  initAudioFiles() {
     try {
       for (let i = 0; i < this.poolSize; i++) {
-        const audio = new Audio('audio/KarteAuf.mp3');
-        audio.preload = 'auto';
-        this.cardAudioPool.push(audio);
+        const audioSnap = new Audio('audio/KarteAuf.mp3');
+        audioSnap.preload = 'auto';
+        this.cardAudioPool.push(audioSnap);
+
+        const audioTrick = new Audio('audio/FadeAway.mp3');
+        audioTrick.preload = 'auto';
+        this.trickAudioPool.push(audioTrick);
       }
     } catch (e) {
       // Fallback auf AudioContext
@@ -105,6 +111,28 @@ class SoundManager {
 
   playTrickCollect() {
     if (!this.enabled) return;
+
+    if (this.trickAudioPool && this.trickAudioPool.length > 0) {
+      try {
+        const audio = this.trickAudioPool[this.trickPoolIndex];
+        this.trickPoolIndex = (this.trickPoolIndex + 1) % this.trickAudioPool.length;
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            this.playSynthesizedTrickCollect();
+          });
+        }
+        return;
+      } catch (err) {
+        // Fallback
+      }
+    }
+
+    this.playSynthesizedTrickCollect();
+  }
+
+  playSynthesizedTrickCollect() {
     this.initContext();
     if (!this.ctx) return;
 
