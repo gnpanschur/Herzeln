@@ -378,6 +378,15 @@ class HerzelnGame {
       return sameSuitCards.map(c => c.id);
     }
 
+    // Wenn keine passende Farbe vorhanden:
+    // In Runde 6 (Herz-König): Hat der Spieler den Herz-König (♥K), MUSS er ihn zwingend sofort zugeben!
+    if (this.roundNumber === 6) {
+      const heartKing = player.hand.find(c => c.suit === 'hearts' && c.rank === 'K');
+      if (heartKing) {
+        return [heartKing.id];
+      }
+    }
+
     return player.hand.map(c => c.id);
   }
 
@@ -420,6 +429,12 @@ class HerzelnGame {
         };
       }
       const leadSuitName = this.currentTrick.length > 0 ? this.currentTrick[0].card.suitName : '';
+      if (this.roundNumber === 6 && player.hand.some(c => c.suit === 'hearts' && c.rank === 'K')) {
+        return {
+          success: false,
+          message: `Regel in Runde 6: Du kannst ${leadSuitName} nicht bedienen und musst den Herz-König (♥K) sofort zugeben!`
+        };
+      }
       return {
         success: false,
         message: `Farbbedienpflicht! Du musst ${leadSuitName} bedienen.`

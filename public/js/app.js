@@ -790,6 +790,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
           const leadSuitName = activeTrick.length > 0 ? activeTrick[0].card.suitName : '';
+          const hasHeartKing = hand.some(c => c.suit === 'hearts' && c.rank === 'K');
+          if (state.roundNumber === 6 && hasHeartKing) {
+            showToast(`In Runde 6 musst du den Herz-König (♥K) sofort zugeben, wenn du ${leadSuitName} nicht bedienen kannst!`);
+            return;
+          }
           showToast(`Farbbedienpflicht! Du musst ${leadSuitName} bedienen.`);
           return;
         }
