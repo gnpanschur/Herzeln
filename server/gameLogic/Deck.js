@@ -26,10 +26,17 @@ class Deck {
     this.reset();
   }
 
-  reset() {
+  /**
+   * Erstellt das Kartendeck.
+   * @param {number} [playerCount=4] - 4 Spieler = 32 Blatt (7 bis Ass), 3 Spieler = 24 Blatt (9 bis Ass)
+   */
+  reset(playerCount = 4) {
     this.cards = [];
+    const minStrength = playerCount === 3 ? 9 : 7;
+    const activeRanks = RANKS.filter(r => r.strength >= minStrength);
+
     for (const suit of SUITS) {
-      for (const rank of RANKS) {
+      for (const rank of activeRanks) {
         const svgFile = `${rank.svgPrefix}_of_${suit.key}${rank.svgSuffix || ''}.svg`;
         const ddFile = `${suit.ddPrefix}_${rank.key}.webp`;
         this.cards.push({
@@ -58,17 +65,29 @@ class Deck {
   }
 
   /**
-   * Teilt die 32 Karten exakt in 4 Hände zu je 8 Karten auf und sortiert sie.
-   * @returns {Array<Array<Object>>} 4 sortierte Hände à 8 Karten
+   * Teilt die Karten exakt auf die Spieler auf (je 8 Karten) und sortiert sie.
+   * @param {number} [playerCount=4] - 4 (32 Karten) oder 3 (24 Karten)
+   * @returns {Array<Array<Object>>} Sortierte Hände à 8 Karten
    */
-  dealFourHands() {
-    this.reset();
+  dealHands(playerCount = 4) {
+    this.reset(playerCount);
     this.shuffle();
-    const hands = [[], [], [], []];
-    for (let i = 0; i < 32; i++) {
-      hands[i % 4].push(this.cards[i]);
+    const totalCards = playerCount * 8;
+    const hands = [];
+    for (let p = 0; p < playerCount; p++) {
+      hands.push([]);
+    }
+    for (let i = 0; i < totalCards; i++) {
+      hands[i % playerCount].push(this.cards[i]);
     }
     return hands.map(hand => Deck.sortHand(hand));
+  }
+
+  /**
+   * Abwärtskompatibel für 4 Spieler
+   */
+  dealFourHands() {
+    return this.dealHands(4);
   }
 
   static sortHand(hand) {

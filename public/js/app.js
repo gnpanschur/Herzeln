@@ -412,7 +412,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // TISCH & SPIELZUSTAND RENDERN
   // =========================================================================
 
-  function getRelativePosition(seatIndex, mySeatIndex) {
+  function getRelativePosition(seatIndex, mySeatIndex, playerCount = 4) {
+    if (playerCount === 3) {
+      const offset = (seatIndex - mySeatIndex + 3) % 3;
+      if (offset === 0) return 'bottom';
+      if (offset === 1) return 'left';
+      if (offset === 2) return 'right';
+      return 'bottom';
+    }
     const offset = (seatIndex - mySeatIndex + 4) % 4;
     if (offset === 0) return 'bottom';
     if (offset === 1) return 'left';
@@ -423,6 +430,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderGameState(state) {
     const totalRounds = state.totalRounds || 7;
     const rCfg = state.roundConfig || {};
+    const targetPlayerCount = state.targetPlayerCount || (state.players ? state.players.length : 4);
+
     if (hudRoomCode) hudRoomCode.textContent = state.roomCode || '----';
     if (hudRoundBadge) {
       const shortName = rCfg.shortTitle || rCfg.title || '';
@@ -434,6 +443,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (roundIconEl) roundIconEl.textContent = rCfg.icon || '🃏';
     if (roundTitleEl) roundTitleEl.textContent = `R${state.roundNumber}: ${rCfg.title || ''}`;
 
+    const centerPotMax = document.getElementById('center-pot-max');
+
     if (state.isDominoRound) {
       let placed = 0;
       if (state.dominoBoard) {
@@ -441,27 +452,37 @@ document.addEventListener('DOMContentLoaded', () => {
           placed += Object.keys(state.dominoBoard[s].cardsByStrength || {}).length;
         }
       }
-      if (trickCounterBadge) trickCounterBadge.textContent = `${placed}/32 Karten`;
+      const totalCards = state.totalCardsCount || (targetPlayerCount === 3 ? 24 : 32);
+      const r7Max = targetPlayerCount === 3 ? 46 : 48;
+      if (trickCounterBadge) trickCounterBadge.textContent = `${placed}/${totalCards} Karten`;
       if (roundPenaltyDesc) roundPenaltyDesc.textContent = rCfg.penaltyText || '';
-      if (roundPotValue) roundPotValue.textContent = `Ausgezahlt: ${formatEuro(state.roundPot)} / 48,00 €`;
-      const pct = Math.min(100, Math.round((state.roundPot / 48) * 100));
+      if (roundPotValue) roundPotValue.textContent = `Ausgezahlt: ${formatEuro(state.roundPot)} / ${formatEuro(r7Max)}`;
+      const pct = Math.min(100, Math.round((state.roundPot / r7Max) * 100));
       if (roundPotBar) roundPotBar.style.width = `${pct}%`;
       if (totalPotValue) totalPotValue.textContent = formatEuro(state.totalPot);
+      if (centerPotText) centerPotText.textContent = formatEuro(state.roundPot);
+      if (centerPotMax) centerPotMax.textContent = `/ ${r7Max} €`;
     } else {
       if (trickCounterBadge) trickCounterBadge.textContent = `Stich ${Math.min(state.trickNumber, 8)}/8`;
       if (roundPenaltyDesc) roundPenaltyDesc.textContent = rCfg.penaltyText || '';
 
-      const pct = Math.min(100, Math.round((state.roundPot / 8) * 100));
-      if (roundPotValue) roundPotValue.textContent = `${formatEuro(state.roundPot)} / 8,00 €`;
+      const rMax = (state.roundNumber === 2 && targetPlayerCount === 3) ? 6 : 8;
+      const pct = Math.min(100, Math.round((state.roundPot / rMax) * 100));
+      if (roundPotValue) roundPotValue.textContent = `${formatEuro(state.roundPot)} / ${formatEuro(rMax)}`;
       if (roundPotBar) roundPotBar.style.width = `${pct}%`;
       if (totalPotValue) totalPotValue.textContent = formatEuro(state.totalPot);
       if (centerPotText) centerPotText.textContent = formatEuro(state.roundPot);
+      if (centerPotMax) centerPotMax.textContent = `/ ${rMax} €`;
     }
 
-    // Sitzplätze aktualisieren
+    // Sitzplätze aktualisieren & ungenutzte Sitze bei 3 Spielern ausblenden
+    const seatTop = document.getElementById('seat-top');
+    if (seatTop) {
+      seatTop.style.display = targetPlayerCount === 3 ? 'none' : '';
+    }
     const mySeat = state.mySeatIndex || 0;
     state.players.forEach((p) => {
-      const pos = getRelativePosition(p.seatIndex, mySeat);
+      const pos = getRelativePosition(p.seatIndex, mySeat, targetPlayerCount);
       updateSeatUI(pos, p, state);
     });
 
@@ -590,14 +611,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dominoGridEl) return;
     dominoGridEl.innerHTML = '';
 
+    const targetPlayerCount = state.targetPlayerCount || (state.players ? state.players.length : 4);
+    if (targetPlayerCount === 3) {
+      dominoGridEl.classList.add('domino-grid-3p');
+    } else {
+      dominoGridEl.classList.remove('domino-grid-3p');
+    }
+
     if (dominoActionBanner) {
       dominoActionBanner.textContent = state.dominoLastAction || 'Start mit Kreuz-Bube (♣B)';
     }
 
     const board = state.dominoBoard || {};
+    const rows = targetPlayerCount === 3
+      ? DOMINO_ROWS_META.filter(r => r.strength >= 9)
+      : DOMINO_ROWS_META;
 
-    // 8 Zeilen (Ass=14 oben bis 7=7 unten) x 4 Spalten (Kreuz, Pik, Herz, Karo)
-    for (const rowMeta of DOMINO_ROWS_META) {
+    // Zeilen (Ass=14 oben bis 7=7 bzw. 9=9 unten) x 4 Spalten (Kreuz, Pik, Herz, Karo)
+    for (const rowMeta of rows) {
       for (const suitMeta of DOMINO_SUITS_META) {
         const cell = document.createElement('div');
         cell.className = 'domino-cell';
@@ -660,13 +691,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const mySeat = state.mySeatIndex || 0;
+    const targetPlayerCount = state.targetPlayerCount || (state.players ? state.players.length : 4);
+    if (trickSlots.top) {
+      trickSlots.top.style.display = targetPlayerCount === 3 ? 'none' : '';
+    }
+
     const trickToDisplay = state.resolvingTrick ? state.resolvingTrick.plays : (state.currentTrick || []);
     const winningCardId = state.resolvingTrick && state.resolvingTrick.winningCard
       ? state.resolvingTrick.winningCard.id
       : null;
 
     trickToDisplay.forEach((play) => {
-      const pos = getRelativePosition(play.seatIndex, mySeat);
+      const pos = getRelativePosition(play.seatIndex, mySeat, targetPlayerCount);
       const slot = trickSlots[pos];
       if (!slot) return;
 
@@ -909,9 +945,13 @@ document.addEventListener('DOMContentLoaded', () => {
       summaryRoundLabel.textContent = `Runde ${state.roundNumber}/${totalRounds}: ${rCfg.icon || ''} ${rCfg.title || ''}`;
     }
     if (summaryRoundPot) {
+      const is3P = state.targetPlayerCount === 3;
+      const roundMax = state.isDominoRound
+        ? (is3P ? 46 : 48)
+        : ((state.roundNumber === 2 && is3P) ? 6 : 8);
       summaryRoundPot.textContent = state.isDominoRound
-        ? `Ausgespielt: ${formatEuro(state.roundPot)} / 48,00 €`
-        : `Kassa: ${formatEuro(state.roundPot)} / 8,00 €`;
+        ? `Ausgespielt: ${formatEuro(state.roundPot)} / ${formatEuro(roundMax)}`
+        : `Kassa: ${formatEuro(state.roundPot)} / ${formatEuro(roundMax)}`;
     }
 
     if (currentRoundPaymentsList) {
@@ -1027,7 +1067,8 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       btnNextRound.classList.add('hidden');
-      const nextStarterSeat = ((state.gameStartSeatIndex || 0) + 1) % 4;
+      const pCount = state.targetPlayerCount || (state.players ? state.players.length : 4);
+      const nextStarterSeat = ((state.gameStartSeatIndex || 0) + 1) % pCount;
       const nextStarterPlayer = state.players.find(p => p.seatIndex === nextStarterSeat);
       const nextStarterLabel = nextStarterPlayer ? nextStarterPlayer.name : `Spieler ${nextStarterSeat + 1}`;
       btnRestartGame.textContent = `🔄 Neues Spiel – Alle 7 Runden neu starten (${nextStarterLabel} beginnt)`;

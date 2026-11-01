@@ -81,8 +81,10 @@ const ROUNDS_CONFIG = [
 ];
 
 const DOMINO_SUIT_COLUMNS = ['clubs', 'spades', 'hearts', 'diamonds'];
-const DOMINO_RANK_ROWS = [14, 13, 12, 11, 10, 9, 8, 7]; // Ass (oben) bis 7 (unten), 11 = Bube/Unter
-const DOMINO_PAYOUTS = [24, 16, 8, 0]; // 1. Platz = 24€, 2. Platz = 16€, 3. Platz = 8€, 4. Platz = 0€
+const DOMINO_RANK_ROWS_4P = [14, 13, 12, 11, 10, 9, 8, 7]; // 32 Karten: Ass (oben) bis 7 (unten)
+const DOMINO_RANK_ROWS_3P = [14, 13, 12, 11, 10, 9]; // 24 Karten: Ass (oben) bis 9 (unten)
+const DOMINO_RANK_ROWS = DOMINO_RANK_ROWS_4P;
+const DOMINO_PAYOUTS_4P = [24, 16, 8, 0]; // 1. Platz = 24€, 2. Platz = 16€, 3. Platz = 8€, 4. Platz = 0€
 
 const BOT_NAMES = ['Bot Anna', 'Bot Lukas', 'Bot Max', 'Bot Felix'];
 
@@ -95,11 +97,18 @@ class HerzelnGame {
    * @param {string} roomCode
    * @param {Array<{id: string, name: string, isHost: boolean}>} humanPlayers
    * @param {Function} onStateChange - Callback () => void
+   * @param {Object} [roomOptions] - { targetPlayerCount: 3 | 4 }
    */
-  constructor(roomCode, humanPlayers, onStateChange) {
+  constructor(roomCode, humanPlayers, onStateChange, roomOptions = {}) {
     this.roomCode = roomCode;
     this.onStateChange = onStateChange;
     this.deck = new Deck();
+
+    // Spieler-Anzahl: 3 (24 Karten, 9 bis Ass) oder 4 (Standard, 32 Karten, 7 bis Ass)
+    const optCount = Number(roomOptions.targetPlayerCount || roomOptions.maxPlayers);
+    this.targetPlayerCount = (optCount === 3 || humanPlayers.length === 3) ? 3 : 4;
+    this.totalCardsCount = this.targetPlayerCount * 8; // 24 oder 32
+    this.minRankStrength = this.targetPlayerCount === 3 ? 9 : 7; // 9 bei 3P, 7 bei 4P
 
     this.gameNumber = 1; // Zählt die gespielten Partien (1, 2, 3, ...)
     this.players = [];
@@ -107,7 +116,7 @@ class HerzelnGame {
 
     this.roundNumber = 1; // 1 bis 7 (1..6 Stich-Runden, 7 = Unteranlegen)
     this.status = 'playing'; // 'playing' | 'trick_resolving' | 'round_end' | 'game_over'
-    this.gameStartSeatIndex = 0; // Spiel 1 beginnt mit Spieler 1 (Index 0), danach 1, 2, 3...
+    this.gameStartSeatIndex = 0; // Spiel 1 beginnt mit Spieler 1 (Index 0), danach 1, 2, (3)...
     this.dealerIndex = 0;
     this.currentTurnIndex = 0;
     this.trickNumber = 1;
@@ -121,13 +130,13 @@ class HerzelnGame {
     // Unteranlegen State (Runde 7)
     // Pro Farbe: { opened: boolean, minStrength: number|null, maxStrength: number|null, cardsByStrength: { [strength]: card } }
     this.dominoBoard = this.createEmptyDominoBoard();
-    this.dominoRankings = []; // Array von { place: 1..4, seatIndex, playerId, name, payout }
+    this.dominoRankings = []; // Array von { place: 1..N, seatIndex, playerId, name, payout }
     this.dominoLastAction = '';
 
     // Kassa (Pot) in Euro
     this.roundPot = 0;
     this.totalPot = 0; // Aktuell in der Kassa liegender Betrag
-    this.totalCollectedPot = 0; // Insgesamt in R1..R6 eingezahlte Summe (48 €)
+    this.totalCollectedPot = 0; // Insgesamt in R1..R6 eingezahlte Summe (48 € bzw. 46 €)
     this.endedByPotLimit = false;
     this.roundEndReason = '';
 
@@ -173,8 +182,9 @@ class HerzelnGame {
   initSeats(humanPlayers) {
     this.players = [];
     let botIdx = 0;
+    const seatCount = this.targetPlayerCount;
 
-    for (let seat = 0; seat < 4; seat++) {
+    for (let seat = 0; seat < seatCount; seat++) {
       if (seat < humanPlayers.length) {
         const hp = humanPlayers[seat];
         const sessionKey = `player_${String(hp.name || seat).trim().toLowerCase()}`;
@@ -198,8 +208,8 @@ class HerzelnGame {
           roundPenaltyReasons: [],
           totalPaid: 0,
           roundPayments: [0, 0, 0, 0, 0, 0], // Einzahlungen in R1..R6 des aktuellen Spiels
-          dominoPlace: null, // 1..4 in Runde 7 des aktuellen Spiels
-          dominoReward: 0, // 24, 16, 8, 0 in Runde 7 des aktuellen Spiels
+          dominoPlace: null, // 1..N in Runde 7 des aktuellen Spiels
+          dominoReward: 0, // In Runde 7 des aktuellen Spiels
           previousGamesPaid: prevPaid,
           previousGamesReward: prevReward,
           previousGamesNet: prevReward - prevPaid,
@@ -269,8 +279,8 @@ class HerzelnGame {
     this.endedByPotLimit = false;
     this.roundEndReason = '';
 
-    const hands = this.deck.dealFourHands();
-    for (let i = 0; i < 4; i++) {
+    const hands = this.deck.dealHands(this.targetPlayerCount);
+    for (let i = 0; i < this.targetPlayerCount; i++) {
       this.players[i].hand = hands[i];
       this.players[i].tricksWon = 0;
       this.players[i].roundPaid = 0;
@@ -292,7 +302,7 @@ class HerzelnGame {
       this.dominoLastAction = `${starter.name} hat den Kreuz-Buben (♣B) und beginnt!`;
     } else {
       // RUNDE 1..6: STICH-RUNDEN
-      this.dealerIndex = (this.gameStartSeatIndex + roundNum - 1) % 4;
+      this.dealerIndex = (this.gameStartSeatIndex + roundNum - 1) % this.targetPlayerCount;
       this.currentTurnIndex = this.dealerIndex;
     }
 
@@ -301,7 +311,26 @@ class HerzelnGame {
   }
 
   getRoundConfig(roundNum = this.roundNumber) {
-    return ROUNDS_CONFIG[roundNum - 1] || ROUNDS_CONFIG[0];
+    const base = ROUNDS_CONFIG[roundNum - 1] || ROUNDS_CONFIG[0];
+    if (this.targetPlayerCount === 3) {
+      if (base.number === 2) {
+        // In Runde 2 gibt es bei 24 Karten 6 Herzen (9, 10, B, D, K, A) -> max 6,00 €
+        return {
+          ...base,
+          maxPot: 6,
+          penaltyText: '1,00 € für jedes Herz (♥) im Stich (max. 6,00 €)'
+        };
+      }
+      if (base.number === 7) {
+        return {
+          ...base,
+          ruleText: 'Start mit Kreuz-Bube (♣B). Unter in die Breite, Farben nach oben (bis Ass) & unten (bis 9) anlegen!',
+          penaltyText: 'Auszahlung: 1. Platz 24 € • 2. Platz 16 € • 3. Platz Rest der Kassa',
+          maxPot: 46
+        };
+      }
+    }
+    return base;
   }
 
   isDominoRound() {
@@ -480,7 +509,15 @@ class HerzelnGame {
     // Prüfen, ob dieser Spieler seine letzte Karte abgelegt hat
     if (player.hand.length === 0 && player.dominoPlace === null) {
       const place = this.dominoRankings.length + 1;
-      const payout = DOMINO_PAYOUTS[place - 1] || 0;
+      let payout = 0;
+      if (this.targetPlayerCount === 3) {
+        // 3 Spieler: 1. Platz = 24€, 2. Platz = 16€, 3. Platz = Rest der gesamten Kassa
+        if (place === 1) payout = Math.min(24, this.totalPot);
+        else if (place === 2) payout = Math.min(16, this.totalPot);
+        else payout = Math.max(0, this.totalPot); // Rest
+      } else {
+        payout = DOMINO_PAYOUTS_4P[place - 1] || 0;
+      }
 
       player.dominoPlace = place;
       player.dominoReward = payout;
@@ -493,7 +530,7 @@ class HerzelnGame {
       if (payout > 0) {
         player.roundPenaltyReasons = [`🏆 ${place}. Platz im Unteranlegen: +${payout},00 € aus der Kassa!`];
       } else {
-        player.roundPenaltyReasons = [`4. Platz (Letzter) im Unteranlegen: 0,00 €`];
+        player.roundPenaltyReasons = [`${place}. Platz (Letzter) im Unteranlegen: 0,00 €`];
       }
 
       this.dominoRankings.push({
@@ -507,7 +544,7 @@ class HerzelnGame {
       this.dominoLastAction = `🎉 ${player.name} ist fertig und sichert sich Platz ${place} (+${payout} €)!`;
     }
 
-    // Prüfen, ob ALLE 4 Spieler ihre Karten abgelegt haben
+    // Prüfen, ob ALLE Spieler ihre Karten abgelegt haben
     const activePlayersLeft = this.players.filter(p => p.hand.length > 0);
     if (activePlayersLeft.length === 0) {
       this.finishDominoRound();
@@ -555,8 +592,9 @@ class HerzelnGame {
   }
 
   advanceDominoTurn() {
-    for (let step = 1; step <= 4; step++) {
-      const nextSeat = (this.currentTurnIndex + step) % 4;
+    const totalP = this.targetPlayerCount;
+    for (let step = 1; step <= totalP; step++) {
+      const nextSeat = (this.currentTurnIndex + step) % totalP;
       if (this.players[nextSeat].hand.length > 0) {
         this.currentTurnIndex = nextSeat;
         return;
@@ -567,10 +605,9 @@ class HerzelnGame {
   finishDominoRound() {
     this.clearTimers();
     const roundCfg = this.getRoundConfig(7);
-    this.roundEndReason = 'Alle 32 Karten wurden angelegt! Die Kassa (24 € / 16 € / 8 €) wurde ausgespielt.';
+    this.roundEndReason = `Alle ${this.totalCardsCount} Karten wurden angelegt! Die Kassa wurde ausgespielt.`;
 
-    // Vollständig abgeschlossenes 7-Runden-Spiel (48 € eingezahlt = 48 € ausgezahlt)
-    // in die Programm-Session-Bilanz sichern
+    // Vollständig abgeschlossenes 7-Runden-Spiel in die Programm-Session-Bilanz sichern
     this.players.forEach(p => {
       if (!p.currentGameCommittedToSession) {
         p.currentGameCommittedToSession = true;
@@ -582,8 +619,8 @@ class HerzelnGame {
       roundNumber: 7,
       title: roundCfg.title,
       icon: roundCfg.icon,
-      roundPot: 48,
-      tricksPlayed: 32,
+      roundPot: this.totalCollectedPot,
+      tricksPlayed: this.totalCardsCount,
       endedByPotLimit: false,
       payments: this.players.map(p => ({
         seatIndex: p.seatIndex,
@@ -619,10 +656,10 @@ class HerzelnGame {
       card: playedCard
     });
 
-    if (this.currentTrick.length === 4) {
+    if (this.currentTrick.length === this.targetPlayerCount) {
       this.resolveCurrentTrick();
     } else {
-      this.currentTurnIndex = (this.currentTurnIndex + 1) % 4;
+      this.currentTurnIndex = (this.currentTurnIndex + 1) % this.targetPlayerCount;
       this.notifyStateChange();
       this.scheduleBotIfNeeded();
     }
@@ -832,7 +869,7 @@ class HerzelnGame {
     });
 
     this.gameNumber = (this.gameNumber || 1) + 1;
-    this.gameStartSeatIndex = (this.gameStartSeatIndex + 1) % 4;
+    this.gameStartSeatIndex = (this.gameStartSeatIndex + 1) % this.targetPlayerCount;
     this.startFirstRound();
     return {
       success: true,
@@ -1025,6 +1062,8 @@ class HerzelnGame {
 
     return {
       roomCode: this.roomCode,
+      targetPlayerCount: this.targetPlayerCount,
+      totalCardsCount: this.totalCardsCount,
       gameNumber: this.gameNumber || 1,
       status: this.status,
       roundNumber: this.roundNumber,
@@ -1103,4 +1142,4 @@ class HerzelnGame {
   }
 }
 
-module.exports = { HerzelnGame, ROUNDS_CONFIG, DOMINO_SUIT_COLUMNS, DOMINO_RANK_ROWS };
+module.exports = { HerzelnGame, ROUNDS_CONFIG, DOMINO_SUIT_COLUMNS, DOMINO_RANK_ROWS_4P, DOMINO_RANK_ROWS_3P };

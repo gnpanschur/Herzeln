@@ -43,6 +43,21 @@
           <input type="text" id="player-name-input" placeholder="z. B. Alex" maxlength="12" autocomplete="off">
         </div>
 
+        <!-- Auswahl Spieler-Anzahl (Modus) -->
+        <div class="form-group">
+          <label>Spieler-Anzahl</label>
+          <div class="mode-select-grid">
+            <button type="button" class="mode-btn active" data-players="4">
+              <strong>4 Spieler</strong>
+              <small>Standard (32 Blatt)</small>
+            </button>
+            <button type="button" class="mode-btn" data-players="3">
+              <strong>3 Spieler</strong>
+              <small>24 Blatt (ohne 7 & 8)</small>
+            </button>
+          </div>
+        </div>
+
         <div class="action-buttons">
           <button id="btn-create-room" class="btn btn-primary btn-glow">
             <span class="icon">✨</span> Raum Erstellen
@@ -87,7 +102,7 @@
         </header>
 
         <div class="players-section">
-          <h3>Spieler am Tisch (<span id="player-count">0</span>/4)</h3>
+          <h3>Spieler am Tisch (<span id="player-count">0</span>/<span id="player-max-count">4</span>)</h3>
           <ul id="players-list" class="players-grid">
             <!-- Dynamische Spieler-Karten untereinander -->
           </ul>
@@ -195,7 +210,7 @@
               <span class="medallion-icon" id="center-lead-suit-icon">🪙</span>
               <span class="medallion-text">
                 <span id="center-lead-suit-text" class="medallion-lead-suit hidden"></span>
-                <span>Kassa: <strong id="center-pot-text">0,00 €</strong> <small>/ 8 €</small></span>
+                <span>Kassa: <strong id="center-pot-text">0,00 €</strong> <small id="center-pot-max">/ 8 €</small></span>
               </span>
             </div>
 
@@ -363,10 +378,10 @@
           <div class="rule-block">
             <h4>🃏 Grundregeln & Farbbedienpflicht</h4>
             <ul>
-              <li>Gespielt wird zu viert am runden Tisch mit <strong>32 Karten</strong> (7, 8, 9, 10, Bube, Dame, König, Ass in Kreuz ♣, Pik ♠, Herz ♥, Karo ♦). Jeder erhält <strong>8 Karten</strong>.</li>
-              <li><strong>Rangfolge:</strong> 7 (niedrigste) &lt; 8 &lt; 9 &lt; 10 &lt; Bube &lt; Dame &lt; König &lt; Ass (höchste). Es gibt <strong>keinen Trumpf</strong>.</li>
+              <li>Gespielt wird zu viert (oder zu dritt) am runden Tisch mit <strong>32 Karten</strong> (4 Spieler) bzw. <strong>24 Karten</strong> (3 Spieler, ohne 7er &amp; 8er). Jeder erhält immer <strong>8 Karten</strong>.</li>
+              <li><strong>Rangfolge:</strong> 7 (nur 4er-Spiel) &lt; 8 &lt; 9 &lt; 10 &lt; Bube &lt; Dame &lt; König &lt; Ass (höchste). Es gibt <strong>keinen Trumpf</strong>.</li>
               <li><strong>Farbbedienpflicht:</strong> Die zuerst ausgespielte Karte bestimmt die Farbe des Stichs. Jeder Spieler <strong>muss diese Farbe bedienen</strong>, sofern er sie auf der Hand hat! Nur wer die Farbe nicht hat, darf eine beliebige andere Karte abwerfen.</li>
-              <li><strong>Rundenende bei 8,00 €:</strong> In jeder Runde landen exakt <strong>8,00 €</strong> in der Kassa. Sobald die 8,00 € in einer Runde voll sind, endet die Runde sofort und es wird abgerechnet!</li>
+              <li><strong>Rundenende bei Kassa-Limit:</strong> In den Runden 1–6 wandern Strafpunkte in die Kassa (R1, R3–R6: je 8,00 € max; R2: 8,00 € bei 4 Spielern bzw. 6,00 € bei 3 Spielern). Sobald das Limit erreicht ist, endet die Runde sofort!</li>
             </ul>
           </div>
 
@@ -400,7 +415,7 @@
               <div class="round-rule-item">
                 <strong>7. Finale: Unteranlegen (Siebener raus / Dominos) 🃏</strong>
                 <span>Startet zwingend mit dem <strong>Kreuz-Buben (♣B)</strong>. In die Breite werden weitere Unter (Buben) ausgelegt, in die Länge wird pro Farbe nach oben (Ober → König → Ass) und nach unten (10 → 9 → 8 → 7) angelegt. Wer nicht anlegen kann, muss passen. Gespielt wird, bis alle fertig sind:<br>
-                🥇 <strong>1. Platz: +24,00 €</strong> • 🥈 <strong>2. Platz: +16,00 €</strong> • 🥉 <strong>3. Platz: +8,00 €</strong> aus der Kassa!</span>
+                🥇 <strong>1. Platz: +24,00 €</strong> • 🥈 <strong>2. Platz: +16,00 €</strong> • 🥉 <strong>3. Platz: +8,00 € (bei 3 Spielern: verbleibender Rest von 6,00 €)</strong> aus der Kassa!</span>
               </div>
             </div>
           </div>

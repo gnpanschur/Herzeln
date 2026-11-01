@@ -33,7 +33,7 @@ const games = new Map();
 const lobbyManager = new LobbyManager(io, {
   gameId: 'herzeln',
   gameTitle: 'Herzeln',
-  minPlayers: 4,
+  minPlayers: 3, // Kann 3 oder 4 sein je nach Raumauswahl
   maxPlayers: 4
 });
 
@@ -50,15 +50,21 @@ function broadcastGameState(roomCode) {
 
 // Wenn Host in der Lobby auf "Spiel Starten" klickt
 lobbyManager.onGameStart((room) => {
-  console.log(`[Herzeln] Starte Spiel für Raum ${room.code} mit ${room.players.length} menschlichen Spielern.`);
+  const targetCount = room.config.maxPlayers || room.config.minPlayers || 4;
+  console.log(`[Herzeln] Starte Spiel für Raum ${room.code} mit ${room.players.length} menschlichen Spielern (Modus: ${targetCount} Spieler).`);
   const existingGame = games.get(room.code);
   if (existingGame) {
     existingGame.clearTimers();
   }
 
-  const game = new HerzelnGame(room.code, room.players, () => {
-    broadcastGameState(room.code);
-  });
+  const game = new HerzelnGame(
+    room.code,
+    room.players,
+    () => {
+      broadcastGameState(room.code);
+    },
+    { targetPlayerCount: targetCount }
+  );
 
   games.set(room.code, game);
   game.startFirstRound();

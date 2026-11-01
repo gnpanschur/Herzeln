@@ -48,8 +48,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Displays
   const displayRoomCode = document.getElementById('display-room-code');
   const playerCountDisplay = document.getElementById('player-count');
+  const playerMaxCountDisplay = document.getElementById('player-max-count');
   const playersList = document.getElementById('players-list');
   const botFillHint = document.getElementById('lobby-bot-hint');
+
+  // Modus-Auswahl (3 oder 4 Spieler)
+  let selectedPlayerCount = 4;
+  const modeBtns = document.querySelectorAll('.mode-btn');
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedPlayerCount = parseInt(btn.dataset.players, 10) || 4;
+    });
+  });
 
   // Gespeicherten Spielernamen aus localStorage laden
   const savedName = localStorage.getItem(config.storageKeyName) || sessionStorage.getItem(config.storageKeyName);
@@ -146,7 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!name) return showError('Bitte gib einen Spielernamen ein!');
 
       localStorage.setItem(config.storageKeyName, name);
-      window.socketClient.createRoom(name, {}, (res) => {
+      window.socketClient.createRoom(name, {
+        minPlayers: selectedPlayerCount,
+        maxPlayers: selectedPlayerCount,
+        targetPlayerCount: selectedPlayerCount
+      }, (res) => {
         if (res && res.success) {
           showScreen('lobby');
         } else {
@@ -257,23 +273,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function updateLobbyUI(state) {
+    const maxP = state.maxPlayers || (state.config && state.config.maxPlayers) || 4;
     if (displayRoomCode) displayRoomCode.textContent = state.code;
     if (playerCountDisplay) playerCountDisplay.textContent = state.players.length;
+    if (playerMaxCountDisplay) playerMaxCountDisplay.textContent = maxP;
 
-    const needed = Math.max(0, 4 - state.players.length);
+    const needed = Math.max(0, maxP - state.players.length);
     if (botFillHint) {
       if (needed === 0) {
-        botFillHint.textContent = '✅ Alle 4 Spieler sind im Raum – Spiel kann gestartet werden!';
+        botFillHint.textContent = `✅ Alle ${maxP} Spieler sind im Raum – Spiel kann gestartet werden!`;
         botFillHint.style.color = '#4ade80';
         botFillHint.style.borderColor = 'rgba(74, 222, 128, 0.45)';
         botFillHint.style.background = 'rgba(74, 222, 128, 0.1)';
       } else if (needed === 1) {
-        botFillHint.textContent = `⏳ Warte noch auf 1 weiteren Spieler (${state.players.length}/4 im Raum)...`;
+        botFillHint.textContent = `⏳ Warte noch auf 1 weiteren Spieler (${state.players.length}/${maxP} im Raum)...`;
         botFillHint.style.color = '#fde68a';
         botFillHint.style.borderColor = 'rgba(245, 158, 11, 0.35)';
         botFillHint.style.background = 'rgba(245, 158, 11, 0.1)';
       } else {
-        botFillHint.textContent = `⏳ Warte noch auf ${needed} weitere Spieler (${state.players.length}/4 im Raum)...`;
+        botFillHint.textContent = `⏳ Warte noch auf ${needed} weitere Spieler (${state.players.length}/${maxP} im Raum)...`;
         botFillHint.style.color = '#fde68a';
         botFillHint.style.borderColor = 'rgba(245, 158, 11, 0.35)';
         botFillHint.style.background = 'rgba(245, 158, 11, 0.1)';
@@ -314,8 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isHost) {
       if (btnStartGame) {
-        // Button "Spiel Starten 🚀" erst anzeigen & freigeben, wenn alle 4 Spieler im Raum sind!
-        if (state.canStart && state.players.length >= 4) {
+        // Button "Spiel Starten 🚀" erst anzeigen & freigeben, wenn alle Spieler im Raum sind!
+        if (state.canStart && state.players.length >= maxP) {
           btnStartGame.style.display = 'inline-flex';
           btnStartGame.disabled = false;
           btnStartGame.style.opacity = '1';
