@@ -1,32 +1,43 @@
 # ♥️ Herzeln – Der Runde Tisch (Multiplayer WebApp)
 
-Moderne Echtzeit-Multiplayer-WebApp für das traditionelle Kartenspiel **Herzeln** (32 Blatt, 4 Spieler am runden Tisch, 6 Strafrunden, automatisches Rundenende bei Erreichen der **8,00 € Kassa**), optimiert für **Smartphone Portrait-Layout (Hochformat)** und vorbereitet für **Render.com**.
+Moderne Echtzeit-Multiplayer-WebApp für das traditionelle Kartenspiel **Herzeln** am runden Tisch mit 7 Runden (6 Strafrunden + Finale: Unteranlegen / Dominos) und automatischer Kassa-Abrechnung. Optimiert für **Smartphone Portrait-Layout (Hochformat)** und vorbereitet für **Render.com**.
 
 ---
 
 ## 🌟 Features
 
-- **Echtzeit-Multiplayer Lobby (wie UNO / Lobby-Basis)**:
-  - Raumerstellung mit 4-stelligem Buchstaben-Code.
+- **Spieler-Auswahl & Modi**:
+  - **4 Spieler (Standard)**: 32 Blatt (7 bis Ass in Kreuz ♣, Pik ♠, Herz ♥, Karo ♦) – jeder Spieler erhält 8 Karten. Gesamt-Kassa: 48,00 €.
+  - **3 Spieler**: 24 Blatt (ohne 7er und 8er; Rangfolge 9 bis Ass) – jeder Spieler erhält 8 Karten. Gesamt-Kassa: 46,00 €.
+- **Echtzeit-Multiplayer Lobby**:
+  - Raumerstellung mit 4-stelligem Buchstaben-Code und Modus-Auswahl (3 oder 4 Spieler).
+  - Die Lobby-Spieleranzeige passt sich automatisch an (z. B. `0/3` bzw. `0/4`).
   - Direktbeitritt per WhatsApp-Einladungslink (`?room=CODE`) mit automatischem Ready-Status.
   - Automatische Übernahme des zuletzt genutzten Spielernamens (`localStorage`).
-  - Bis zu 4 menschliche Spieler; freie Plätze am 4er-Tisch werden bei Spielstart automatisch mit taktischen KI-Bots aufgefüllt.
+  - Taktische KI-Bots übernehmen bei Verbindungsabbrüchen oder freien Plätzen.
 - **Original Herzeln-Regelwerk (Der Runde Tisch)**:
-  - **32 Blatt** (7, 8, 9, 10, Bube, Dame, König, Ass in Kreuz ♣, Pik ♠, Herz ♥, Karo ♦) – jeder der 4 Spieler erhält exakt **8 Karten**.
   - **Farbbedienpflicht**: Automatische Zugvalidierung und visuelle Hervorhebung aller gültigen Handkarten.
-  - **6 Runden & Dynamisches Rundenende bei 8,00 €**:
-    1. **Runde 1 – Keine Stiche 🚫**: 1,00 € pro Stich.
-    2. **Runde 2 – Keine Herzen ♥**: 1,00 € pro Herz im Stich.
-    3. **Runde 3 – Keine Damen 👸**: 2,00 € pro Dame im Stich.
-    4. **Runde 4 – Keine Asse 🅰️**: 2,00 € pro Ass im Stich.
-    5. **Runde 5 – Erster & Letzter Stich ⚡**: Je 4,00 € für den 1. und den 8. Stich.
+  - **Die 7 Runden**:
+    1. **Runde 1 – Keine Stiche 🚫**: 1,00 € pro Stich (max. 8,00 €).
+    2. **Runde 2 – Keine Herzen ♥**: 1,00 € pro Herz im Stich (max. 8,00 € bei 4 Spielern, max. 6,00 € bei 3 Spielern).
+    3. **Runde 3 – Keine Damen 👸**: 2,00 € pro Dame im Stich (max. 8,00 €).
+    4. **Runde 4 – Keine Asse 🅰️**: 2,00 € pro Ass im Stich (max. 8,00 €).
+    5. **Runde 5 – Erster & Letzter Stich ⚡**: Je 4,00 € für den 1. und den 8. Stich (max. 8,00 €).
     6. **Runde 6 – Der Herz-König 👑**: 8,00 € für den Fang des Herz-Königs (♥K).
-  - **Sofortiges Rundenende bei 8,00 € Kassa-Summe**: Sobald die 8,00 € in einer Runde erreicht sind (z. B. sobald der Herz-König in Runde 6 fällt oder alle 4 Damen in Runde 3 vergeben sind), endet die Runde sofort und das Abrechnungsfenster öffnet sich!
-- **Transparente Kassa- & Gesamtabrechnung**:
-  - Permanente Anzeige der aktuellen Runden-Kassa (`0,00 € / 8,00 €`) und der Gesamt-Kassa am Tisch.
-  - Detaillierte Abrechnungstabelle nach jeder Runde (und jederzeit über den `💶 Kassa`-Button): Wer hat wie viel in dieser Runde und über alle 6 Runden hinweg bezahlt?
+    7. **Runde 7 – Finale: Unteranlegen (Dominos / Siebener raus) 🃏**:
+       - Zwingender Start mit dem Kreuz-Buben (♣B).
+       - Buben/Unter in die Breite, Farben nach oben (bis Ass) und nach unten (bis 7 bzw. bis 9 bei 3 Spielern).
+       - **Auszahlung 4 Spieler**: 1. Platz: +24,00 € • 2. Platz: +16,00 € • 3. Platz: +8,00 € • 4. Platz: 0,00 €.
+       - **Auszahlung 3 Spieler**: 1. Platz: +24,00 € • 2. Platz: +16,00 € • 3. Platz: Rest der Kassa (+6,00 €).
+  - **Sofortiges Rundenende bei Kassa-Limit**: Sobald der maximale Runden-Betrag erreicht ist, endet die Stichrunde sofort und das Abrechnungsfenster öffnet sich!
+- **Transparente Kassa & Bilanz**:
+  - Permanente Anzeige der aktuellen Kassa und der Gesamt-Kassa am Tisch.
+  - Detaillierte Abrechnungstabelle nach jeder Runde sowie Gesamtsieger-Podium nach Runde 7.
+- **Atmosphäre & Sound**:
+  - Authentische Soundeffekte beim Ausspielen von Karten und Stechen von Stichen.
+  - Umschaltbares französisches Skat-Blatt und doppeldeutsches Blatt.
 - **Handy Portrait-Layout (Hochformat)**:
-  - Speziell für einhändige Smartphone-Bedienung im Hochformat gestaltet (inkl. Landscape-Sperre, `rem`-Skalierung, Wake Lock API gegen Display-Standby und umschaltbarem Französischen Skat-Blatt / Doppeldeutschen Blatt).
+  - Speziell für einhändige Smartphone-Bedienung im Hochformat gestaltet (inkl. Landscape-Sperre, `rem`-Skalierung, Wake Lock API gegen Display-Standby und blauem Vollbild-Button).
 
 ---
 
@@ -43,4 +54,3 @@ Moderne Echtzeit-Multiplayer-WebApp für das traditionelle Kartenspiel **Herzeln
    *(Oder einfach Doppelklick auf `Start_Herzeln.bat`)*
 3. **Im Browser öffnen**:
    - `http://localhost:3000`
-
